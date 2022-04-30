@@ -1,18 +1,21 @@
-const express = require('express');
-const { v4: uuidv4 } = require('uuid');
+const express = require('express')
+const { v4: uuidv4 } = require('uuid')
+const cors = require('cors')
 
-const app = express();
+const app = express()
 
+app.use(cors())
 app.use(express.json())
 
 let toDoList = [
   {
     id: uuidv4(),
-    content: 'HTML is easy',
+    task: 'study html',
+    description: 'HTML is easy',
     date: '2019-05-30T17:30:31.098Z',
     important: true,
     complete: false
-  },
+  }
 ]
 
 app.get('/', (req, res) => {
@@ -21,6 +24,29 @@ app.get('/', (req, res) => {
 
 app.get('/todos', (req, res) => {
   res.json(toDoList)
+})
+
+app.patch('/todos/:id', (req, res) => {
+  const { id } = req.params
+  const { complete } = req.body
+
+  toDoList.map(toDo => {
+    if (toDo.id === id) {
+      toDo.complete = complete
+    }
+    return null
+  })
+
+  res.status(200).send('Modificado exitosamente')
+})
+
+app.delete('/todos/:id', (req, res) => {
+  const { id } = req.params
+  const newToDos = toDoList.filter(todo => todo.id !== id)
+
+  toDoList = newToDos
+
+  res.status(200).send('Tarea eliminada exitosamente!')
 })
 
 app.post('/todos', (req, res) => {
@@ -33,7 +59,10 @@ app.post('/todos', (req, res) => {
 
   if (!task || !description) {
     console.log('Complete todos los campos')
+    console.log(req.body)
   }
+
+  const date = new Date().toDateString()
 
   const newTask = {
     id: uuidv4(),
@@ -41,18 +70,21 @@ app.post('/todos', (req, res) => {
     description,
     important: important || false,
     complete: complete || false,
+    date
   }
 
-  // toDoList.push(newTask)
   toDoList = [
     ...toDoList,
     newTask
   ]
-  res.status(201).end()
+
+  res
+    .status(201)
+    .send('Tarea creada exitosamente')
 })
 
-const PORT = 3001;
+const PORT = 3001
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`)
-});
+})
