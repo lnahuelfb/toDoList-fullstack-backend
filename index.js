@@ -7,16 +7,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-let toDoList = [
-  {
-    id: uuidv4(),
-    task: 'study html',
-    description: 'HTML is easy',
-    date: '2019-05-30T17:30:31.098Z',
-    important: true,
-    complete: false
-  }
-]
+let toDoList = []
 
 app.get('/', (req, res) => {
   res.send('<h1>To Do List</h1>')
